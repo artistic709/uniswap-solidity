@@ -32,7 +32,8 @@ contract UniswapFactory {
     require(token != address(0));
     require(exchangeTemplate != address(0));
     require(token_to_exchange[token] == address(0));
-    UniswapExchange exchange = new UniswapExchange();
+    address payable newEx = address(uint160(createClone(exchangeTemplate)));
+    UniswapExchange exchange = UniswapExchange(newEx);
     exchange.setup(token);
     token_to_exchange[token] = address(exchange);
     exchange_to_token[address(exchange)] = token;
@@ -41,6 +42,17 @@ contract UniswapFactory {
     id_to_token[token_id] = token;
     emit NewExchange(token, address(exchange));
     return address(exchange);
+  }
+
+  function createClone(address target) internal returns (address result) {
+    bytes20 targetBytes = bytes20(target);
+    assembly {
+      let clone := mload(0x40)
+      mstore(clone, 0x3d602d80600a3d3981f3363d3d373d3d3d363d73000000000000000000000000)
+      mstore(add(clone, 0x14), targetBytes)
+      mstore(add(clone, 0x28), 0x5af43d82803e903d91602b57fd5bf30000000000000000000000000000000000)
+      result := create(0, clone, 0x37)
+    }
   }
 
   /***********************************|

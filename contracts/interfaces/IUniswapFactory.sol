@@ -8,4 +8,6 @@ interface IUniswapFactory {
   function getExchange(address token) external view returns (address payable);
   function getToken(address token) external view returns (address);
   function getTokenWihId(uint256 token_id) external view returns (address);
+  function exchangeTemplate() external view returns (address);
+  function tokenCount() external view returns (uint256);
 }
